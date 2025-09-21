@@ -10,11 +10,13 @@ export default function Header() {
         <header className="w-full border-b border-gray-200">
             <div className="flex justify-between items-center px-24 py-2.5">
                 <div className="flex items-center">
-                    <img
-                        src="/logo.svg"
-                        alt="RedSeam Clothing Logo"
-                        className="inline-block h-10 w-auto"
-                    />
+                    <Link href='/'>
+                        <img
+                            src="/logo.svg"
+                            alt="RedSeam Clothing Logo"
+                            className="inline-block h-10 w-auto"
+                        />
+                    </Link>
                 </div>
                 <div className="flex items-center gap-4">
                     <img

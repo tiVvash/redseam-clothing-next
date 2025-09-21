@@ -2,59 +2,122 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 
-const DataContext = createContext();
+const DataContext = createContext(null);
 
 export const DataProvider = ({ children }) => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [priceFrom, setPriceFrom] = useState(null);
-  const [priceTo, setPriceTo] = useState(null);
-  const [sort, setSort] = useState(null);
+    const [token, setToken] = useState(null);
+    const [user, setUser] = useState(null);
+    const [authError, setAuthError] = useState("");
+    const [authLoading, setAuthLoading] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [priceFrom, setPriceFrom] = useState(0);
+    const [priceTo, setPriceTo] = useState(null);
+    const [sort, setSort] = useState(null);
 
-    const params = {
-      page,
-      ...(priceFrom !== null && { "filter[price_from]": priceFrom }),
-      ...(priceTo !== null && { "filter[price_to]": priceTo }),
-      ...(sort && { sort }),
+    useEffect(() => {
+        const savedToken = localStorage.getItem("token");
+        if (savedToken) setToken(savedToken);
+    }, []);
+    useEffect(() => {
+        fetchProducts();
+    }, [page, priceFrom, priceTo, sort]);
+
+    const fetchProducts = async (overridePage) => {
+        setLoading(true);
+        try {
+            const currentPage = overridePage || page;
+            const params = {
+                page: currentPage,
+                ...(priceFrom !== null && { "filter[price_from]": priceFrom }),
+                ...(priceTo !== null && { "filter[price_to]": priceTo }),
+                ...(sort && { sort }),
+            };
+
+            const url = `https://api.redseam.redberryinternship.ge/api/products?${new URLSearchParams(
+                params
+            ).toString()}`;
+
+            const res = await fetch(url, { headers: { Accept: "application/json" } });
+            if (!res.ok) throw new Error("Failed to fetch products");
+
+            const json = await res.json();
+            setProducts(json.data || []);
+            setTotalPages(Math.ceil(json.meta.total / 10));
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const url = `https://api.redseam.redberryinternship.ge/api/products?${new URLSearchParams(params).toString()}`;
+    const login = async (email, password) => {
+        setAuthError("");
+        setAuthLoading(true);
+        try {
+            const res = await fetch("https://api.redseam.redberryinternship.ge/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
 
-    fetch(url, { headers: { Accept: "application/json" } })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch products");
-        return res.json();
-      })
-      .then((json) => setProducts(json.data)) // ⚡ use json.data
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [page, priceFrom, priceTo, sort]);
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || "Login failed");
+            }
 
-  return (
-    <DataContext.Provider
-      value={{
-        products,
-        loading,
-        page,
-        setPage,
-        priceFrom,
-        setPriceFrom,
-        priceTo,
-        setPriceTo,
-        sort,
-        setSort,
-      }}
-    >
-      {children}
-    </DataContext.Provider>
-  );
+            const data = await res.json();
+            setToken(data.token);
+            setUser(data.user || null);
+            localStorage.setItem("token", data.token);
+            return true;
+        } catch (err) {
+            setAuthError(err.message);
+            return false;
+        } finally {
+            setAuthLoading(false);
+        }
+    };
+
+    const logout = () => {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem("token");
+    };
+
+    return (
+        <DataContext.Provider
+            value={{
+                products,
+                loading,
+                page,
+                setPage,
+                totalPages,
+                priceFrom,
+                setPriceFrom,
+                priceTo,
+                setPriceTo,
+                sort,
+                setSort,
+                fetchProducts,
+                token,
+                user,
+                authError,
+                authLoading,
+                login,
+                logout,
+            }}
+        >
+            {children}
+        </DataContext.Provider>
+    );
 };
 
 export const useData = () => useContext(DataContext);
+
 
 
 // const colorMap = {

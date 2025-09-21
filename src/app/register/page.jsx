@@ -1,14 +1,12 @@
+'use client';
+
 import Header from "@/components/Header";
-import Login from "@/components/Login";
 import { DataProvider } from "@/context/DataContext";
 
-
-export default function login() {
+export default function Register() {
     return (
         <DataProvider>
             <Header />
-            <Login />
         </DataProvider>
-
     )
 }
