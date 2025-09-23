@@ -7,7 +7,7 @@ export default function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     return (
-        <header className="w-full border-b border-gray-200">
+        <header className="w-full">
             <div className="flex justify-between items-center px-24 py-2.5">
                 <div className="flex items-center">
                     <Link href='/'>
