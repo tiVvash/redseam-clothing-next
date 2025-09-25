@@ -1,14 +1,13 @@
 import Header from "@/components/Header";
 import Login from "@/components/Login";
-import { DataProvider } from "@/context/DataContext";
 
 
 export default function login() {
     return (
-        <DataProvider>
+        <>
             <Header />
             <Login />
-        </DataProvider>
+        </>
 
     )
 }

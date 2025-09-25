@@ -18,6 +18,30 @@ export const DataProvider = ({ children }) => {
     const [priceTo, setPriceTo] = useState(null);
     const [sort, setSort] = useState(null);
 
+    const [singleProduct, setSingleProduct] = useState(null);
+const [singleLoading, setSingleLoading] = useState(false);
+
+const fetchProductById = async (id) => {
+  setSingleLoading(true);
+  try {
+    const res = await fetch(
+      `https://api.redseam.redberryinternship.ge/api/products/${id}`,
+      { headers: { Accept: "application/json" } }
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch product");
+
+    const json = await res.json();
+    setSingleProduct(json);
+    return json;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    setSingleLoading(false);
+  }
+};
+
     useEffect(() => {
         const savedToken = localStorage.getItem("token");
         if (savedToken) setToken(savedToken);
@@ -103,6 +127,9 @@ export const DataProvider = ({ children }) => {
                 sort,
                 setSort,
                 fetchProducts,
+                singleProduct,
+                singleLoading,
+                fetchProductById,
                 token,
                 user,
                 authError,
@@ -117,30 +144,3 @@ export const DataProvider = ({ children }) => {
 };
 
 export const useData = () => useContext(DataContext);
-
-
-
-// const colorMap = {
-//     White: "#FFFFFF",
-//     Red: "#FF0000",
-//     Multi: "linear-gradient(90deg, red, yellow, green, blue)",
-//     Blue: "#0000FF",
-//     "Navy Blue": "#001F54",
-//     Grey: "#808080",
-//     Black: "#000000",
-//     Purple: "#800080",
-//     Orange: "#FFA500",
-//     Beige: "#F5F5DC",
-//     Pink: "#FFC0CB",
-//     Green: "#008000",
-//     Cream: "#FFFDD0",
-//     Maroon: "#800000",
-//     Brown: "#A52A2A",
-//     Peach: "#FFE5B4",
-//     "Off White": "#F8F8F0",
-//     Mauve: "#E0B0FF",
-//     Yellow: "#FFFF00",
-//     Magenta: "#FF00FF",
-//     Khaki: "#F0E68C",
-//     Olive: "#808000",
-//   };
