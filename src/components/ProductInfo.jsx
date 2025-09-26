@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 
 const colorMap = {
   White: "#FFFFFF",
@@ -26,6 +27,12 @@ const colorMap = {
 };
 
 export default function ProductInfo({ product, selectedColor, setSelectedColor, selectedSize, setSelectedSize }) {
+  const [quantity, setQuantity] = useState(1);
+
+  const handleQuantityChange = (e) => {
+    setQuantity(Number(e.target.value));
+  };
+
   return (
     <div className="flex flex-col gap-10 w-full md:w-[704px]">
       {/* Name & Price */}
@@ -69,6 +76,49 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor, 
             </button>
           ))}
         </div>
+      </div>
+      <div className="quantity">
+        <p>Quantity:</p>
+        <select
+          id="quantity"
+          value={quantity}
+          onChange={handleQuantityChange}
+className='w-16 h-10 rounded border'
+        >
+          {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+            <option key={num} value={num}>
+              {num}
+            </option>
+          ))}
+        </select>
+      </div>
+      <button
+  onClick={() => console.log("Added to cart:", { product, selectedColor, selectedSize, quantity })}
+  className="w-full bg-[#FF4000] hover:bg-[#e63a00] text-white font-semibold py-3 rounded-lg transition-colors"
+>
+  Add to Cart
+</button>
+
+      <hr className="w-full border-t border-gray-300 my-4" />
+
+      <div className="flex flex-col gap-4">
+        <h2 className="text-[20px] font-medium text-[#10151F]">Details</h2>
+        <div className="flex items-center justify-between">
+          <p className="text-[16px] text-[#3E424A]">
+            Brand: {product.brand?.name || "N/A"}
+          </p>
+          {product.brand?.image && (
+            <img
+              src={product.brand.image}
+              alt={product.brand.name}
+              className="w-[100px] h-[51px] object-contain"
+            />
+          )}
+        </div>
+        <p className="text-[16px] text-[#3E424A]">
+          {product.description ||
+            "This product contains regenerative cotton, which is grown using farming methods that seek to improve soil health, watersheds and biodiversity."}
+        </p>
       </div>
     </div>
   );
