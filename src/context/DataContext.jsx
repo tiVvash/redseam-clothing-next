@@ -82,29 +82,58 @@ const fetchProductById = async (id) => {
         setAuthError("");
         setAuthLoading(true);
         try {
-            const res = await fetch("https://api.redseam.redberryinternship.ge/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Accept: "application/json" },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || "Login failed");
-            }
-
+          const res = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+    
+          if (!res.ok) {
             const data = await res.json();
-            setToken(data.token);
-            setUser(data.user || null);
-            localStorage.setItem("token", data.token);
-            return true;
+            throw new Error(data.message || "Login failed");
+          }
+    
+          const data = await res.json();
+          setToken(data.token);
+          setUser(data.user || null);
+          localStorage.setItem("token", data.token);
+          return true;
         } catch (err) {
-            setAuthError(err.message);
-            return false;
+          setAuthError(err.message);
+          return false;
         } finally {
-            setAuthLoading(false);
+          setAuthLoading(false);
         }
-    };
+      };
+
+      const register = async (formData) => {
+        setAuthError("");
+        setAuthLoading(true);
+        try {
+            fetch("/api/register", { method: "POST", body: formData })
+    
+          if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.message || "Registration failed");
+          }
+    
+          const data = await res.json();
+          setToken(data.token);
+          setUser(data.user || null);
+          localStorage.setItem("token", data.token);
+          return true;
+        } catch (err) {
+          setAuthError(err.message);
+          return false;
+        } finally {
+          setAuthLoading(false);
+        }
+      };
+    
+      
+    
+      
+      
 
     const logout = () => {
         setToken(null);
@@ -135,6 +164,7 @@ const fetchProductById = async (id) => {
                 authError,
                 authLoading,
                 login,
+                register,
                 logout,
             }}
         >

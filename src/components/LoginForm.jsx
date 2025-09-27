@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useData } from "@/context/DataContext";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginForm() {
   const context = useData();
+  const router = useRouter();
 
   if (!context) {
     return (
@@ -21,7 +23,8 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
+    const success = await login(email, password);
+    if (success) router.push("/");
   };
 
   return (
@@ -37,11 +40,17 @@ export default function LoginForm() {
             id="email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+                setEmail(e.target.value);
+                if (authError) context.setAuthError("");
+              }}
+              aria-invalid={!!authError}
+              aria-describedby={authError ? "auth-error" : undefined}
             placeholder="Enter your email"
             className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF4000]"
             required
           />
+          {authError && <p id="auth-error" className="text-sm text-red-500">{authError}</p>}
         </div>
 
         <div className="flex flex-col gap-1">
