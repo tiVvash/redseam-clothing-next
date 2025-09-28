@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import { useData } from "@/context/DataContext";
 
 const colorMap = {
   White: "#FFFFFF",
@@ -28,9 +29,24 @@ const colorMap = {
 
 export default function ProductInfo({ product, selectedColor, setSelectedColor, selectedSize, setSelectedSize }) {
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useData();
+  const [mainImage] = useState(product.images?.[0] || "/placeholder.png");
 
   const handleQuantityChange = (e) => {
     setQuantity(Number(e.target.value));
+  };
+
+
+  const handleAdd = () => {
+    addToCart({
+      productId: product.id,
+      quantity,
+      color: selectedColor,
+      size: selectedSize,
+      image: mainImage, 
+      price: product.price,
+      name: product.name,
+    });
   };
 
   return (
@@ -93,7 +109,7 @@ className='w-16 h-10 rounded border'
         </select>
       </div>
       <button
-  onClick={() => console.log("Added to cart:", { product, selectedColor, selectedSize, quantity })}
+  onClick={handleAdd}
   className="w-full bg-[#FF4000] hover:bg-[#e63a00] text-white font-semibold py-3 rounded-lg transition-colors"
 >
   Add to Cart
