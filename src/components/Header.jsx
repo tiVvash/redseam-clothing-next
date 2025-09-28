@@ -24,7 +24,7 @@ export default function Header() {
                 <div className="flex items-center">
                     <Link href='/'>
                         <img
-                            src="/logo.svg"
+                            src="/Logo.svg"
                             alt="RedSeam Clothing Logo"
                             className="inline-block h-10 w-auto"
                         />
